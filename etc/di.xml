@@ -56,12 +56,12 @@
     </virtualType>
 
     <!-- Configuration reader -->
-    <type name="Magento\Payment\Gateway\Config\Config">
+    <virtualType name="channelEnginePayment" type="Magento\Payment\Gateway\Config\Config">
         <arguments>
             <argument name="methodCode" xsi:type="string">channelengine_payment
             </argument>
         </arguments>
-    </type>
+    </virtualType>
 
     <!-- Value handlers infrastructure -->
     <type name="Magento\Payment\Gateway\Config\ValueHandlerPool">
@@ -73,7 +73,7 @@
     </type>
     <type name="Magento\Payment\Gateway\Config\ConfigValueHandler">
         <arguments>
-            <argument name="configInterface" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="configInterface" xsi:type="object">channelEnginePayment</argument>
         </arguments>
     </type>
 </config>
