@@ -9,6 +9,7 @@ use ChannelEngine\ChannelEngineIntegration\IntegrationCore\BusinessLogic\API\Htt
 use ChannelEngine\ChannelEngineIntegration\IntegrationCore\BusinessLogic\Orders\Contracts\OrdersService;
 use ChannelEngine\ChannelEngineIntegration\IntegrationCore\BusinessLogic\Products\Contracts\ProductsService;
 use ChannelEngine\ChannelEngineIntegration\IntegrationCore\BusinessLogic\TransactionLog\Contracts\TransactionLogService;
+use ChannelEngine\ChannelEngineIntegration\IntegrationCore\Infrastructure\Configuration\ConfigurationManager;
 use ChannelEngine\ChannelEngineIntegration\IntegrationCore\Infrastructure\Http\Exceptions\HttpCommunicationException;
 use ChannelEngine\ChannelEngineIntegration\IntegrationCore\Infrastructure\Http\Exceptions\HttpRequestException;
 use ChannelEngine\ChannelEngineIntegration\IntegrationCore\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
@@ -109,10 +110,12 @@ class CheckStatus extends Action
      */
     private function getTaskData(string $taskType): array
     {
-        $queueItem = $this->getQueueService()->findLatestByType($taskType);
+        // Same store context as the dashboard, so both agree on whether the sync has finished.
+        $context = ConfigurationManager::getInstance()->getContext();
+        $queueItem = $this->getQueueService()->findLatestByType($taskType, $context);
 
         if ($taskType === 'ProductsResyncTask' && !$queueItem) {
-            $queueItem = $this->getQueueService()->findLatestByType('ProductSync');
+            $queueItem = $this->getQueueService()->findLatestByType('ProductSync', $context);
         }
 
         if (!$queueItem) {

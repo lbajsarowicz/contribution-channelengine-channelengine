@@ -55,7 +55,7 @@ class AttributeAfterDeleteObserver implements ObserverInterface
         $attribute = $observer->getEvent()->getAttribute();
         $code = $attribute->getAttributeCode();
         $storeId = $this->storeManager->getStore()->getStoreId();
-        ConfigurationManager::getInstance()->setContext($storeId);
+        ConfigurationManager::getInstance()->setContext((string)$storeId);
 
         $threeLevelSyncSettings = $this->getThreeLevelSyncSettingsService()->getThreeLevelSyncSettings();
         $threeLevelSyncEnabled = $threeLevelSyncSettings && $threeLevelSyncSettings->getEnableThreeLevelSync();

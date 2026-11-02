@@ -29,7 +29,7 @@ class CeWebhook extends Helper
      * @throws TestFrameworkException
      * @throws QueryFilterInvalidParamException
      */
-    public function executeWebHook(string $url ='',string $httpMethod = 'GET', string $dataAsJson = null)
+    public function executeWebHook(string $url ='',string $httpMethod = 'GET', ?string $dataAsJson = null)
     {
         $data = [];
         if ($dataAsJson) {

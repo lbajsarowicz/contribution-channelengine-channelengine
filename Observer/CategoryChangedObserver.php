@@ -72,7 +72,7 @@ class CategoryChangedObserver implements ObserverInterface
                 $this->saveProductUpdateEvent($productIds);
             }
         } else {
-            ConfigurationManager::getInstance()->setContext($storeId);
+            ConfigurationManager::getInstance()->setContext((string)$storeId);
 
             if (!$this->getPluginStatusService()->isEnabled() || !$this->getStateService()->isOnboardingCompleted()) {
                 return;

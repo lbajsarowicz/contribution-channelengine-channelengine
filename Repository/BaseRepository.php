@@ -135,7 +135,7 @@ class BaseRepository implements RepositoryInterface
      * @throws LocalizedException
      * @throws QueryFilterInvalidParamException
      */
-    public function select(QueryFilter $filter = null): array
+    public function select(?QueryFilter $filter = null): array
     {
         /** @var Entity $entity */
         $entity = new $this->entityClass;
@@ -155,7 +155,7 @@ class BaseRepository implements RepositoryInterface
      * @throws LocalizedException
      * @throws QueryFilterInvalidParamException
      */
-    public function selectOne(QueryFilter $filter = null): ?Entity
+    public function selectOne(?QueryFilter $filter = null): ?Entity
     {
         if ($filter === null) {
             $filter = new QueryFilter();
@@ -240,7 +240,7 @@ class BaseRepository implements RepositoryInterface
      * @throws LocalizedException
      * @throws QueryFilterInvalidParamException
      */
-    public function count(QueryFilter $filter = null): int
+    public function count(?QueryFilter $filter = null): int
     {
         return count($this->select($filter));
     }

@@ -80,7 +80,7 @@ class CancellationRequestHandler
      *
      * @return Cancellation
      */
-    private function prepareDto(CancellationRequest $request, array $shipments = null)
+    private function prepareDto(CancellationRequest $request, ?array $shipments = null)
     {
         $dto = new Cancellation();
         $itemQuantities = [];

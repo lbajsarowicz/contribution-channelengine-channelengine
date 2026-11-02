@@ -18,7 +18,7 @@ class ProductEvent extends ChannelEngineEntity
     /**
      * @inheritDoc
      */
-    public function selectEntities(Entity $entity, QueryFilter $filter = null): array
+    public function selectEntities(Entity $entity, ?QueryFilter $filter = null): array
     {
         if (!$filter) {
             $filter = new QueryFilter();

@@ -88,7 +88,7 @@ class ChannelEngineEntity extends AbstractDb
      * @throws LocalizedException
      * @throws QueryFilterInvalidParamException
      */
-    public function selectEntities(Entity $entity, QueryFilter $filter = null): array
+    public function selectEntities(Entity $entity, ?QueryFilter $filter = null): array
     {
         $connection = $this->getConnection();
 

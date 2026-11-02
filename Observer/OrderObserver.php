@@ -158,7 +158,7 @@ class OrderObserver implements ObserverInterface
      */
     private function setContext(Order $order): void
     {
-        ConfigurationManager::getInstance()->setContext($order->getStoreId());
+        ConfigurationManager::getInstance()->setContext((string)$order->getStoreId());
     }
 
     /**

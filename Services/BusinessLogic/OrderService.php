@@ -187,7 +187,11 @@ class OrderService extends OrdersService
                 $this->saveOrderExtensionData($order, $createdOrder);
             }
 
-            if ($this->getOrderSettings() && $this->getOrderSettings()->isCreateReservationsEnabled()) {
+            // Reservations are placed only once per order. Re-saving an existing order (e.g. when acknowledging
+            // it failed and the sync is retried) must not reserve the stock again, but a retry still places
+            // the reservations if the previous attempt failed before placing them.
+            if ($this->getOrderSettings() && $this->getOrderSettings()->isCreateReservationsEnabled()
+                && !$this->orderExtensionResource->hasOrderPlacedReservations((int)$createdOrder->getEntityId())) {
                 $processReservationItems = new ProcessReservationItems(
                     $this->salesEventFactory,
                     $this->itemsToSellFactory,

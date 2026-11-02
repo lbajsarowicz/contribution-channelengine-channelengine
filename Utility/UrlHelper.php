@@ -54,7 +54,7 @@ class UrlHelper
      *
      * @throws NoSuchEntityException
      */
-    public function getFrontendUrl(string $routePath, array $routeParams = null): string
+    public function getFrontendUrl(string $routePath, ?array $routeParams = null): string
     {
         $storeView = $this->storeManager->getStore();
 
@@ -75,7 +75,7 @@ class UrlHelper
      *
      * @return string Publicly visible URL of the requested back-end controller.
      */
-    public function getBackendUrl(string $routePath, array $routeParams = null): string
+    public function getBackendUrl(string $routePath, ?array $routeParams = null): string
     {
         return $this->backendUrlHelper->getUrl($routePath, $routeParams);
     }

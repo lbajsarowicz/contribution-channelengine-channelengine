@@ -67,25 +67,39 @@ class TriggerSync extends Action
         $orderSync = $postParams['order_sync'];
         $productSync = $postParams['product_sync'];
 
+        $enqueuing = null;
+
         try {
+            // Flags are set before enqueue, because enqueue wakes up the task runner and a short sync can finish
+            // (and clear its flag) before enqueue returns.
             if ($orderSync) {
+                $enqueuing = 'order';
+                $this->getStateService()->setManualOrderSyncInProgress(true);
                 $this->getQueueService()->enqueue(
                     'channel-engine-orders',
                     new OrderSync(),
                     $this->_request->getParam('storeId')
                 );
-                $this->getStateService()->setManualOrderSyncInProgress(true);
             }
 
             if ($productSync) {
+                $enqueuing = 'product';
+                $this->getStateService()->setManualProductSyncInProgress(true);
                 $this->getQueueService()->enqueue(
                     'channel-engine-products',
                     new ProductsResyncTask(),
                     $this->_request->getParam('storeId')
                 );
-                $this->getStateService()->setManualProductSyncInProgress(true);
             }
         } catch (QueueStorageUnavailableException $e) {
+            if ($enqueuing === 'order') {
+                $this->getStateService()->setManualOrderSyncInProgress(false);
+            }
+
+            if ($enqueuing === 'product') {
+                $this->getStateService()->setManualProductSyncInProgress(false);
+            }
+
             return $this->resultJsonFactory->create()->setData(
                 [
                     'success' => false,

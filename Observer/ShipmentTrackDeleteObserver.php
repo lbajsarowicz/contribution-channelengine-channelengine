@@ -162,7 +162,7 @@ class ShipmentTrackDeleteObserver implements ObserverInterface
      */
     private function setContext(Track $track): void
     {
-        ConfigurationManager::getInstance()->setContext($track->getStoreId());
+        ConfigurationManager::getInstance()->setContext((string)$track->getStoreId());
     }
 
     /**

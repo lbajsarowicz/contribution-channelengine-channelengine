@@ -62,4 +62,26 @@ class ChannelEngineOrder extends AbstractDb
 
         return !empty($result) ? $result : [];
     }
+
+    /**
+     * Checks if "order placed" stock reservations already exist for the Magento order.
+     *
+     * @param int $orderId Magento order entity ID.
+     *
+     * @return bool
+     *
+     * @throws LocalizedException
+     */
+    public function hasOrderPlacedReservations(int $orderId): bool
+    {
+        $connection = $this->getConnection();
+        $select = $connection->select()
+            ->from($this->getTable('inventory_reservation'), ['reservation_id'])
+            ->where("JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.event_type')) = ?", 'order_placed')
+            ->where("JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.object_type')) = ?", 'order')
+            ->where("JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.object_id')) = ?", (string)$orderId)
+            ->limit(1);
+
+        return (bool)$connection->fetchOne($select);
+    }
 }

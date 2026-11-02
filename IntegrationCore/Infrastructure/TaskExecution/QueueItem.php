@@ -201,7 +201,7 @@ class QueueItem extends Entity
      * @param Task|null $task Associated task object.
      * @param string $context Context in which task will be executed.
      */
-    public function __construct(Task $task = null, $context = '')
+    public function __construct(?Task $task = null, $context = '')
     {
         $this->timeProvider = ServiceRegister::getService(TimeProvider::CLASS_NAME);
 
@@ -829,7 +829,7 @@ class QueueItem extends Entity
      * @return int|null
      *   Timestamp of provided datetime or null if time is not defined.
      */
-    protected function getTimestamp(DateTime $time = null)
+    protected function getTimestamp(?DateTime $time = null)
     {
         return $time !== null ? $time->getTimestamp() : null;
     }

@@ -8,6 +8,8 @@ use ChannelEngine\ChannelEngineIntegration\IntegrationCore\BusinessLogic\Notific
 use ChannelEngine\ChannelEngineIntegration\IntegrationCore\Infrastructure\Configuration\ConfigurationManager;
 use ChannelEngine\ChannelEngineIntegration\IntegrationCore\Infrastructure\ORM\Exceptions\QueryFilterInvalidParamException;
 use ChannelEngine\ChannelEngineIntegration\IntegrationCore\Infrastructure\ServiceRegister;
+use ChannelEngine\ChannelEngineIntegration\IntegrationCore\Infrastructure\TaskExecution\QueueItem;
+use ChannelEngine\ChannelEngineIntegration\IntegrationCore\Infrastructure\TaskExecution\QueueService;
 use ChannelEngine\ChannelEngineIntegration\Services\BusinessLogic\PluginStatusService;
 use ChannelEngine\ChannelEngineIntegration\Services\BusinessLogic\StateService;
 use ChannelEngine\ChannelEngineIntegration\Services\BusinessLogic\StoreService;
@@ -171,6 +173,8 @@ class Dashboard extends Template
             return 'sync-in-progress';
         }
 
+        $this->clearFinishedManualSyncFlags();
+
         $manualProductSync = $this->getStateService()->isManualProductSyncInProgress();
         $manualOrderSync = $this->getStateService()->isManualOrderSyncInProgress();
 
@@ -191,6 +195,55 @@ class Dashboard extends Template
         }
 
         return 'sync-completed';
+    }
+
+    /**
+     * Clears manual sync flags whose latest task has already finished, so the dashboard
+     * does not keep showing the progress page (and redirecting in a loop) for a finished sync.
+     *
+     * @return void
+     *
+     * @throws QueryFilterInvalidParamException
+     */
+    private function clearFinishedManualSyncFlags(): void
+    {
+        $context = ConfigurationManager::getInstance()->getContext();
+
+        if ($this->getStateService()->isManualOrderSyncInProgress()
+            && $this->isTaskFinished($this->getQueueService()->findLatestByType('OrderSync', $context))) {
+            $this->getStateService()->setManualOrderSyncInProgress(false);
+        }
+
+        if ($this->getStateService()->isManualProductSyncInProgress()) {
+            $productSync = $this->getQueueService()->findLatestByType('ProductsResyncTask', $context)
+                ?: $this->getQueueService()->findLatestByType('ProductSync', $context);
+
+            if ($this->isTaskFinished($productSync)) {
+                $this->getStateService()->setManualProductSyncInProgress(false);
+            }
+        }
+    }
+
+    /**
+     * Checks if queue item is completed, failed or aborted. A missing queue item (e.g. already removed by
+     * the obsolete task cleanup) also counts as finished, because no sync can be running for it.
+     *
+     * @param QueueItem|null $queueItem
+     *
+     * @return bool
+     */
+    private function isTaskFinished(?QueueItem $queueItem): bool
+    {
+        return $queueItem === null
+            || in_array($queueItem->getStatus(), [QueueItem::COMPLETED, QueueItem::FAILED, QueueItem::ABORTED], true);
+    }
+
+    /**
+     * @return QueueService
+     */
+    private function getQueueService(): QueueService
+    {
+        return ServiceRegister::getService(QueueService::class);
     }
 
     /**
